@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>YUNGCHENG_PA YCT Label v2</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f2f5;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+        padding: 20px;
+      }
+      .label-card {
+        background-color: #bce2f7; /* Light blue background matching original */
+        width: 800px;
+        border: 3px solid #2b3e4a;
+        padding: 20px 25px 25px 25px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        color: #000;
+      }
+
+      .grid-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+        padding: 10px 0;
+        border-bottom: 2px solid #1a6fb0;
+      }
+
+      .grid-row.no-border {
+        border-bottom: none;
+      }
+
+      .grid-row-3 {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        padding: 10px 0;
+      }
+
+      .col-right {
+        justify-self: end;
+        text-align: right;
+      }
+
+      .col-left {
+        justify-self: start;
+        text-align: left;
+      }
+
+      .col {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        padding: 0 5px;
+      }
+
+      .col-span-2 {
+        grid-column: span 2;
+      }
+
+      .label-title {
+        color: #0d63a5; /* Blue header text color */
+        font-size: 18px;
+        font-weight: 400;
+        margin-bottom: 6px;
+        white-space: nowrap;
+        letter-spacing: -0.9px;
+      }
+
+      .label-value {
+        color: #000000;
+        font-family: "Times New Roman", Times, Georgia, serif;
+        font-size: 28px;
+        font-weight: bold;
+        display: flex;
+        align-items: baseline;
+        gap: 15px;
+      }
+
+      .label-value .unit {
+        font-family: "Times New Roman", Times, Georgia, serif;
+        font-size: 26px;
+        font-weight: bold;
+      }
+
+      /* Bottom section layout */
+      .bottom-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-top: 15px;
+        padding-top: 5px;
+      }
+
+      .brand-block {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .brand-cn {
+        color: #0d63a5;
+        font-size: 34px;
+        margin: 0;
+        letter-spacing: 1px;
+        line-height: 1.1;
+      }
+
+      .brand-en {
+        color: #0d63a5;
+        font-family: "Times New Roman", Times, Georgia, serif;
+        font-stretch: condensed;
+        font-size: 26px;
+        line-height: 1.1;
+        letter-spacing: -1.5px;
+      }
+
+      .qr-material-block {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+
+      .qr-code {
+        width: 74px;
+        height: 74px;
+      }
+
+      .material-text {
+        color: #000000;
+        font-size: 20px;
+        font-weight: 400;
+        white-space: nowrap;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="label-card">
+      <!-- Row 1 -->
+      <div class="grid-row">
+        <div class="col">
+          <div class="label-title">产品类型 TYPE</div>
+          <div class="label-value">PA</div>
+        </div>
+        <div class="col">
+          <div class="label-title">厚度THICKNESS</div>
+          <div class="label-value">15 <span class="unit">&mu;m</span></div>
+        </div>
+        <div class="col">
+          <div class="label-title">等级GRADE</div>
+          <div class="label-value">YCT1</div>
+        </div>
+        <div class="col">
+          <div class="label-title">电晕CORONA</div>
+          <div class="label-value">Inside</div>
+        </div>
+      </div>
+
+      <!-- Row 2 -->
+      <div class="grid-row">
+        <div class="col">
+          <div class="label-title">宽度 WIDTH</div>
+          <div class="label-value">940 <span class="unit">mm</span></div>
+        </div>
+        <div class="col">
+          <div class="label-title">卷长 LENGTH</div>
+          <div class="label-value">6000 <span class="unit">m</span></div>
+        </div>
+        <div class="col">
+          <div class="label-title">净重NET.</div>
+          <div class="label-value">97.3 <span class="unit">kg</span></div>
+        </div>
+        <div class="col">
+          <div class="label-title">检验员 INSPECTOR</div>
+          <div class="label-value">二</div>
+        </div>
+      </div>
+
+      <!-- Row 3 -->
+      <div class="grid-row-3">
+        <div class="col">
+          <div class="label-title">接头数JOINT</div>
+          <div class="label-value">0</div>
+        </div>
+        <div class="col col-left">
+          <div class="label-title">接头位置 JOINT POSITION</div>
+          <div class="label-value"></div>
+        </div>
+        <div class="col col-right">
+          <div class="label-title">出厂编号 PRODUCT NO.</div>
+          <div class="label-value" style="font-size: 22px">L12674108854</div>
+        </div>
+      </div>
+
+      <!-- Bottom Section -->
+      <div class="bottom-section">
+        <div class="brand-block">
+          <div class="brand-cn">双向拉伸尼龙薄膜</div>
+          <div class="brand-en">Biaxial Orientated Polyamide film</div>
+        </div>
+
+        <div class="qr-material-block">
+          <div class="qr-code" id="qrcode"></div>
+          <div class="material-text">产品材质: 聚酰胺-6(PA6)</div>
+        </div>
+      </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script>
+      new QRCode(document.getElementById("qrcode"), {
+        text: "R32401140669",
+        width: 76,
+        height: 76,
+        colorDark: "#000000",
+        colorLight: "#bce2f7",
+        correctLevel: QRCode.CorrectLevel.M,
+      });
+    </script>
+  </body>
+</html>
