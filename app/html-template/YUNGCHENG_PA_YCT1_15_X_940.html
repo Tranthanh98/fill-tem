@@ -1,0 +1,534 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>YUNGCHENG PA YCT1 15 × 940</title>
+    <style>
+      :root {
+        --ink: #000;
+        --blue: #0874bc;
+        --line: #0873b7;
+        --paper-blue: #bae6fa;
+        --frame: #202729;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        min-width: 1032px;
+        min-height: 1192px;
+        background: var(--frame);
+      }
+
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 18px 14px 12px;
+        color: var(--ink);
+        font-family: Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+      }
+
+      .sheet {
+        position: relative;
+        width: 1004px;
+        height: 1162px;
+        flex: 0 0 auto;
+        background: #fff;
+        overflow: hidden;
+      }
+
+      .header {
+        position: relative;
+        height: 217px;
+        background: #fff;
+      }
+
+      .product-name-cn {
+        position: absolute;
+        top: 35px;
+        left: 62px;
+        margin: 0;
+        font-size: 69px;
+        line-height: 1;
+        font-weight: 400;
+        letter-spacing: 7px;
+        white-space: nowrap;
+      }
+
+      .product-name-en {
+        position: absolute;
+        top: 129px;
+        left: 256px;
+        margin: 0;
+        font-size: 75px;
+        line-height: 1;
+        font-weight: 400;
+        letter-spacing: 12px;
+      }
+
+      .license-logo {
+        position: absolute;
+        top: 24px;
+        right: 102px;
+        width: 134px;
+        height: 170px;
+        object-fit: contain;
+      }
+
+      .food-use {
+        position: absolute;
+        top: 25px;
+        right: 29px;
+        color: #243f61;
+        font-family: "STKaiti", "KaiTi", "PingFang SC", serif;
+        font-size: 44px;
+        line-height: 1.34;
+        font-weight: 700;
+        writing-mode: vertical-rl;
+        letter-spacing: 2px;
+      }
+
+      .label {
+        position: absolute;
+        top: 214px;
+        left: 14px;
+        width: 980px;
+        height: 937px;
+        background: var(--paper-blue);
+        border: 3px solid #27577c;
+        overflow: hidden;
+      }
+
+      .label-title {
+        color: var(--blue);
+        font-family:
+          "Arial Narrow", "PingFang SC", "Microsoft YaHei", sans-serif;
+        font-size: 21px;
+        line-height: 1.05;
+        font-weight: 400;
+        letter-spacing: -1.3px;
+        white-space: nowrap;
+      }
+
+      .serif {
+        font-family: "Times New Roman", "Songti SC", "SimSun", serif;
+        font-weight: 700;
+      }
+
+      .top-grid {
+        display: grid;
+        grid-template-columns: 221px 226px 271px 256px;
+        height: 353px;
+        border-bottom: 3px solid var(--line);
+      }
+
+      .split-column,
+      .top-panel {
+        border-right: 3px solid var(--line);
+      }
+
+      .split-cell,
+      .top-panel {
+        position: relative;
+        padding: 13px 8px;
+      }
+
+      .split-cell:first-child {
+        height: 184px;
+        border-bottom: 3px solid var(--line);
+      }
+
+      .split-cell:last-child {
+        height: 166px;
+      }
+
+      .type-value {
+        margin: 35px 0 0 30px;
+        font-size: 57px;
+        line-height: 1;
+      }
+
+      .thickness-value {
+        position: relative;
+        margin-top: 37px;
+        text-align: center;
+        font-size: 59px;
+        line-height: 1;
+      }
+
+      .thickness-value .unit {
+        position: absolute;
+        top: 53px;
+        right: 10px;
+        font-size: 39px;
+        font-weight: 400;
+      }
+
+      .net-value {
+        position: relative;
+        margin: 20px 0 0 28px;
+        font-size: 59px;
+        line-height: 1;
+      }
+
+      .net-value .unit {
+        position: absolute;
+        top: 49px;
+        left: 114px;
+        font-size: 40px;
+        font-weight: 400;
+      }
+
+      .corona-value {
+        margin-top: 24px;
+        text-align: center;
+        font-size: 52px;
+        line-height: 1;
+      }
+
+      .grade-value {
+        position: absolute;
+        top: 126px;
+        left: -2px;
+        font-size: 112px;
+        line-height: 1;
+        white-space: nowrap;
+      }
+
+      .width-value {
+        margin-top: 94px;
+        text-align: center;
+        font-size: 119px;
+        line-height: 1;
+      }
+
+      .width-unit {
+        margin: 49px 36px 0 0;
+        text-align: right;
+        font-size: 42px;
+        line-height: 1;
+        font-weight: 400;
+      }
+
+      .factory-grid {
+        display: grid;
+        grid-template-columns: 447px 271px 256px;
+        height: 188px;
+        border-bottom: 3px solid var(--line);
+      }
+
+      .factory-cell {
+        position: relative;
+        padding: 14px 9px;
+        border-right: 3px solid var(--line);
+      }
+
+      .factory-cell:last-child {
+        border-right: 0;
+      }
+
+      .product-number {
+        margin: 23px 0 0 13px;
+        font-size: 50px;
+        line-height: 1;
+        letter-spacing: -1px;
+      }
+
+      .joint-count,
+      .length-value {
+        margin-top: 27px;
+        text-align: center;
+        font-size: 51px;
+        line-height: 1;
+      }
+
+      .length-unit {
+        margin: 24px 30px 0 0;
+        text-align: right;
+        font-size: 40px;
+        line-height: 1;
+        font-weight: 400;
+      }
+
+      .code-area {
+        position: relative;
+        height: 216px;
+        border-bottom: 3px solid var(--line);
+      }
+
+      .product-qr {
+        position: absolute;
+        top: 15px;
+        left: 42px;
+        width: 145px;
+        height: 145px;
+        image-rendering: pixelated;
+      }
+
+      .material-qr {
+        position: absolute;
+        top: 29px;
+        right: 163px;
+        width: 112px;
+        height: 112px;
+        image-rendering: pixelated;
+      }
+
+      .grade-mark {
+        position: absolute;
+        top: 34px;
+        right: 6px;
+        font-size: 61px;
+        line-height: 1;
+      }
+
+      .material {
+        position: absolute;
+        right: 16px;
+        bottom: 15px;
+        font-family: "Songti SC", "SimSun", serif;
+        font-size: 34px;
+        line-height: 1;
+        white-space: nowrap;
+      }
+
+      .footer-grid {
+        display: grid;
+        grid-template-columns: 578px 205px 191px;
+        height: 174px;
+      }
+
+      .footer-cell {
+        position: relative;
+        border-right: 3px solid var(--line);
+      }
+
+      .footer-cell:last-child {
+        border-right: 0;
+      }
+
+      .company {
+        color: var(--blue);
+        padding: 22px 8px 5px;
+        text-align: center;
+      }
+
+      .company-cn {
+        font-family: "STKaiti", "KaiTi", "PingFang SC", serif;
+        font-size: 20px;
+        line-height: 1;
+        font-weight: 700;
+        letter-spacing: 5px;
+      }
+
+      .company-en {
+        margin-top: 7px;
+        font-family: "Arial Narrow", Arial, sans-serif;
+        font-size: 19px;
+        line-height: 1;
+        font-weight: 700;
+        letter-spacing: 3.6px;
+        white-space: nowrap;
+      }
+
+      .address {
+        margin-top: 3px;
+        text-align: left;
+        font-family: "Arial Narrow", "PingFang SC", sans-serif;
+        font-size: 13px;
+        line-height: 1.65;
+        letter-spacing: -0.4px;
+        white-space: nowrap;
+      }
+
+      .address .address-en {
+        font-size: 10px;
+        letter-spacing: 1.2px;
+      }
+
+      .address .website {
+        margin-left: 92px;
+      }
+
+      .footer-meta {
+        padding: 4px 8px;
+      }
+
+      .footer-meta .label-title {
+        font-size: 20px;
+      }
+
+      .date-value {
+        margin-top: 43px;
+        text-align: center;
+        font-family: "Times New Roman", "Songti SC", serif;
+        font-size: 39px;
+        line-height: 1;
+        white-space: nowrap;
+      }
+
+      .shelf-life {
+        margin-top: 15px;
+        text-align: center;
+        font-family: "Songti SC", "SimSun", serif;
+        font-size: 35px;
+        line-height: 1;
+        white-space: nowrap;
+      }
+
+      .inspection-marks {
+        margin-top: 39px;
+        text-align: center;
+        font-family: "Songti SC", "SimSun", serif;
+        font-size: 35px;
+        line-height: 1;
+      }
+
+      .inspection-marks span {
+        display: block;
+      }
+
+      @media print {
+        @page {
+          size: 1032px 1192px;
+          margin: 0;
+        }
+
+        html,
+        body {
+          width: 1032px;
+          height: 1192px;
+          print-color-adjust: exact;
+          -webkit-print-color-adjust: exact;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="sheet" aria-label="Yungcheng PA YCT1 product label">
+      <header class="header">
+        <h1 class="product-name-cn">双向拉伸尼龙薄膜</h1>
+        <p class="product-name-en">BOPA</p>
+        <img
+          class="license-logo"
+          src="assets/yungcheng-pa-yct1/food-production-license.png"
+          alt="Food production license"
+        />
+        <div class="food-use">食品用</div>
+      </header>
+
+      <section class="label">
+        <div class="top-grid">
+          <div class="split-column">
+            <div class="split-cell">
+              <div class="label-title">产品类型 TYPE</div>
+              <div class="type-value serif">PA</div>
+            </div>
+            <div class="split-cell">
+              <div class="label-title">净重NET.</div>
+              <div class="net-value serif">
+                97.3 <span class="unit">kg</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="split-column">
+            <div class="split-cell">
+              <div class="label-title">厚度THICKNESS</div>
+              <div class="thickness-value serif">
+                15 <span class="unit">μm</span>
+              </div>
+            </div>
+            <div class="split-cell">
+              <div class="label-title">电晕CORONA</div>
+              <div class="corona-value serif">Inside</div>
+            </div>
+          </div>
+
+          <div class="top-panel">
+            <div class="label-title">等级GRADE</div>
+            <div class="grade-value serif">YCT1</div>
+          </div>
+
+          <div class="top-panel" style="border-right: 0">
+            <div class="label-title">宽度 WIDTH</div>
+            <div class="width-value serif">940</div>
+            <div class="width-unit serif">mm</div>
+          </div>
+        </div>
+
+        <div class="factory-grid">
+          <div class="factory-cell">
+            <div class="label-title">出厂编号PRODUCTNO</div>
+            <div class="product-number serif">L12674108854</div>
+          </div>
+          <div class="factory-cell">
+            <div class="label-title">接头数/位置 JOINTPOSTION</div>
+            <div class="joint-count serif">0</div>
+          </div>
+          <div class="factory-cell">
+            <div class="label-title">卷长 LENGTH</div>
+            <div class="length-value serif">6000</div>
+            <div class="length-unit serif">m</div>
+          </div>
+        </div>
+
+        <div class="code-area">
+          <img
+            class="product-qr"
+            src="assets/yungcheng-pa-yct1/product-qr.png"
+            alt="Product QR code"
+          />
+          <img
+            class="material-qr"
+            src="assets/yungcheng-pa-yct1/material-qr.png"
+            alt="Material QR code"
+          />
+          <div class="grade-mark serif">F3</div>
+          <div class="material">产品材质: 聚酰胺-6(PA6)</div>
+        </div>
+
+        <div class="footer-grid">
+          <div class="footer-cell company">
+            <div class="company-cn">昆山运城塑业有限公司</div>
+            <div class="company-en">
+              KUNSHAN YUNCHENG PLASTIC INDUSTRY CO., LTD
+            </div>
+            <div class="address">
+              <div>江苏省昆山经济技术开发区洪湖路1558号</div>
+              <div class="address-en">
+                NO. 1558 HONGHU ROAD, ECONOMIC AND<br />
+                TECHNICAL DEVELOPMENT ZONE, KUNSHAN CHINA
+                <span class="website">http://www.ksbopa.com</span>
+              </div>
+              <div>电话/TEL: 0512-82603555　 传真/FAX:0512-82603588</div>
+              <div>
+                QS许可证号：（苏）XK16-204-02925　　　 执行标准：GB/T20218-2021
+              </div>
+            </div>
+          </div>
+
+          <div class="footer-cell footer-meta">
+            <div class="label-title">生产日期 DATE</div>
+            <div class="date-value">2026-06-18</div>
+            <div class="shelf-life">贮存期二年</div>
+          </div>
+
+          <div class="footer-cell footer-meta">
+            <div class="label-title">检验员 INSPECTOR</div>
+            <div class="inspection-marks">
+              <span>二</span>
+              <span>合格</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
