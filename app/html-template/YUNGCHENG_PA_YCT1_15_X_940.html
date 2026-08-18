@@ -10,7 +10,7 @@
         --blue: #0874bc;
         --line: #0873b7;
         --paper-blue: #bae6fa;
-        --frame: #202729;
+        --frame: #ffffff;
       }
 
       * {
@@ -413,8 +413,8 @@
   <body>
     <main class="sheet" aria-label="Yungcheng PA YCT1 product label">
       <header class="header">
-        <h1 class="product-name-cn">双向拉伸尼龙薄膜</h1>
-        <p class="product-name-en">BOPA</p>
+        <h1 class="product-name-cn">{{productNameCn}}</h1>
+        <p class="product-name-en">{{productNameEn}}</p>
         <img
           class="license-logo"
           src="assets/yungcheng-pa-yct1/food-production-license.png"
@@ -428,12 +428,12 @@
           <div class="split-column">
             <div class="split-cell">
               <div class="label-title">产品类型 TYPE</div>
-              <div class="type-value serif">PA</div>
+              <div class="type-value serif">{{type}}</div>
             </div>
             <div class="split-cell">
               <div class="label-title">净重NET.</div>
               <div class="net-value serif">
-                97.3 <span class="unit">kg</span>
+                {{netWeight}} <span class="unit">kg</span>
               </div>
             </div>
           </div>
@@ -442,23 +442,23 @@
             <div class="split-cell">
               <div class="label-title">厚度THICKNESS</div>
               <div class="thickness-value serif">
-                15 <span class="unit">μm</span>
+                {{thickness}} <span class="unit">μm</span>
               </div>
             </div>
             <div class="split-cell">
               <div class="label-title">电晕CORONA</div>
-              <div class="corona-value serif">Inside</div>
+              <div class="corona-value serif">{{corona}}</div>
             </div>
           </div>
 
           <div class="top-panel">
             <div class="label-title">等级GRADE</div>
-            <div class="grade-value serif">YCT1</div>
+            <div class="grade-value serif">{{grade}}</div>
           </div>
 
           <div class="top-panel" style="border-right: 0">
             <div class="label-title">宽度 WIDTH</div>
-            <div class="width-value serif">940</div>
+            <div class="width-value serif">{{width}}</div>
             <div class="width-unit serif">mm</div>
           </div>
         </div>
@@ -466,15 +466,15 @@
         <div class="factory-grid">
           <div class="factory-cell">
             <div class="label-title">出厂编号PRODUCTNO</div>
-            <div class="product-number serif">L12674108854</div>
+            <div class="product-number serif">{{productNumber}}</div>
           </div>
           <div class="factory-cell">
             <div class="label-title">接头数/位置 JOINTPOSTION</div>
-            <div class="joint-count serif">0</div>
+            <div class="joint-count serif">{{jointCount}}</div>
           </div>
           <div class="factory-cell">
             <div class="label-title">卷长 LENGTH</div>
-            <div class="length-value serif">6000</div>
+            <div class="length-value serif">{{length}}</div>
             <div class="length-unit serif">m</div>
           </div>
         </div>
@@ -490,15 +490,15 @@
             src="assets/yungcheng-pa-yct1/material-qr.png"
             alt="Material QR code"
           />
-          <div class="grade-mark serif">F3</div>
-          <div class="material">产品材质: 聚酰胺-6(PA6)</div>
+          <div class="grade-mark serif">{{gradeMark}}</div>
+          <div class="material">{{material}}</div>
         </div>
 
         <div class="footer-grid">
           <div class="footer-cell company">
-            <div class="company-cn">昆山运城塑业有限公司</div>
+            <div class="company-cn">{{companyCn}}</div>
             <div class="company-en">
-              KUNSHAN YUNCHENG PLASTIC INDUSTRY CO., LTD
+              {{companyEn}}
             </div>
             <div class="address">
               <div>江苏省昆山经济技术开发区洪湖路1558号</div>
@@ -516,15 +516,15 @@
 
           <div class="footer-cell footer-meta">
             <div class="label-title">生产日期 DATE</div>
-            <div class="date-value">2026-06-18</div>
-            <div class="shelf-life">贮存期二年</div>
+            <div class="date-value">{{productionDate}}</div>
+            <div class="shelf-life">{{shelfLife}}</div>
           </div>
 
           <div class="footer-cell footer-meta">
             <div class="label-title">检验员 INSPECTOR</div>
             <div class="inspection-marks">
               <span>二</span>
-              <span>合格</span>
+              <span>{{inspector}}</span>
             </div>
           </div>
         </div>

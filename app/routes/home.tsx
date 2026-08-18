@@ -3,7 +3,12 @@ import { useState } from "react";
 import { Link } from "react-router";
 
 import { TemplateDocument } from "../components/template-document";
-import { templates } from "../template-data";
+import { listTemplates } from "../template-library.server";
+import { getDefaultValues } from "../template-types";
+
+export function loader() {
+  return { templates: listTemplates() };
+}
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -12,7 +17,8 @@ export function meta({}: Route.MetaArgs) {
   ];
 }
 
-export default function Home() {
+export default function Home({ loaderData }: Route.ComponentProps) {
+  const { templates } = loaderData;
   const [query, setQuery] = useState("");
   const normalizedQuery = query.trim().toLowerCase();
   const visibleTemplates = normalizedQuery
@@ -70,7 +76,7 @@ export default function Home() {
                 <TemplateDocument
                   scale={template.thumbnailScale}
                   template={template}
-                  values={template.defaults}
+                  values={getDefaultValues(template)}
                   title={`${template.name} preview`}
                 />
                 <span className="open-template">Open editor →</span>

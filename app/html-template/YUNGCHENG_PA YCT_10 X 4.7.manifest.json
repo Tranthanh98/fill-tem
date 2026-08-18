@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "order": 2,
+  "id": "yungcheng-pa-yct-10-4-7",
+  "name": "YUNGCHENG PA YCT",
+  "description": "Compact label · 10 × 4.7",
+  "category": "Product label",
+  "canvas": { "width": 860, "height": 560 },
+  "thumbnailScale": 0.31,
+  "builderScale": 0.82,
+  "fieldGroups": [
+    {
+      "title": "Product",
+      "fields": [
+        { "key": "productNameCn", "label": "Product name (Chinese)", "type": "text", "default": "双向拉伸尼龙薄膜" },
+        { "key": "productNameEn", "label": "Product name (English)", "type": "text", "default": "Biaxial Orientated Polyamide film" },
+        { "key": "type", "label": "Type", "type": "text", "default": "PA" },
+        { "key": "grade", "label": "Grade", "type": "text", "default": "YCT1" },
+        { "key": "corona", "label": "Corona", "type": "text", "default": "Inside" },
+        { "key": "material", "label": "Material", "type": "textarea", "default": "产品材质: 聚酰胺-6(PA6)" }
+      ]
+    },
+    {
+      "title": "Dimensions & roll",
+      "fields": [
+        { "key": "thickness", "label": "Thickness", "type": "number", "unit": "μm", "default": "15" },
+        { "key": "width", "label": "Width", "type": "number", "unit": "mm", "default": "940" },
+        { "key": "length", "label": "Length", "type": "number", "unit": "m", "default": "6000" },
+        { "key": "netWeight", "label": "Net weight", "type": "number", "unit": "kg", "default": "97.3", "step": "0.1" },
+        { "key": "jointCount", "label": "Joint count", "type": "number", "default": "0" },
+        { "key": "jointPosition", "label": "Joint position", "type": "text", "default": "" }
+      ]
+    },
+    {
+      "title": "Tracking",
+      "fields": [
+        { "key": "productNumber", "label": "Product number", "type": "text", "default": "L12674108854" },
+        { "key": "inspector", "label": "Inspector result", "type": "text", "default": "二" }
+      ]
+    }
+  ]
+}

@@ -526,9 +526,9 @@ a.template-card:focus-visible {
   position: relative;
 }
 
-.input-wrap input {
+.input-wrap input,
+.input-wrap textarea {
   width: 100%;
-  height: 40px;
   padding: 0 12px;
   border: 1px solid #dce2eb;
   border-radius: 9px;
@@ -540,7 +540,19 @@ a.template-card:focus-visible {
   transition: border-color 150ms ease, box-shadow 150ms ease;
 }
 
-.input-wrap input:focus {
+.input-wrap input {
+  height: 40px;
+}
+
+.input-wrap textarea {
+  min-height: 72px;
+  padding-block: 10px;
+  resize: vertical;
+  line-height: 1.45;
+}
+
+.input-wrap input:focus,
+.input-wrap textarea:focus {
   border-color: #7da6fa;
   box-shadow: 0 0 0 3px rgba(28, 97, 231, 0.1);
 }

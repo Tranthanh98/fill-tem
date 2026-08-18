@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "order": 1,
+  "id": "yungcheng-pa-yct1-15-940",
+  "name": "YUNGCHENG PA YCT1",
+  "description": "Production label · 15 μm × 940 mm",
+  "category": "Product label",
+  "canvas": { "width": 1032, "height": 1192 },
+  "thumbnailScale": 0.205,
+  "builderScale": 0.58,
+  "fieldGroups": [
+    {
+      "title": "Product",
+      "fields": [
+        { "key": "productNameCn", "label": "Product name (Chinese)", "type": "text", "default": "双向拉伸尼龙薄膜" },
+        { "key": "productNameEn", "label": "Product name (English)", "type": "text", "default": "BOPA" },
+        { "key": "type", "label": "Type", "type": "text", "default": "PA" },
+        { "key": "grade", "label": "Grade", "type": "text", "default": "YCT1" },
+        { "key": "corona", "label": "Corona", "type": "text", "default": "Inside" },
+        { "key": "material", "label": "Material", "type": "textarea", "default": "产品材质: 聚酰胺-6(PA6)" }
+      ]
+    },
+    {
+      "title": "Dimensions & roll",
+      "fields": [
+        { "key": "thickness", "label": "Thickness", "type": "number", "unit": "μm", "default": "15" },
+        { "key": "width", "label": "Width", "type": "number", "unit": "mm", "default": "940" },
+        { "key": "length", "label": "Length", "type": "number", "unit": "m", "default": "6000" },
+        { "key": "netWeight", "label": "Net weight", "type": "number", "unit": "kg", "default": "97.3", "step": "0.1" },
+        { "key": "jointCount", "label": "Joint count", "type": "number", "default": "0" }
+      ]
+    },
+    {
+      "title": "Tracking",
+      "fields": [
+        { "key": "productNumber", "label": "Product number", "type": "text", "default": "L12674108854" },
+        { "key": "gradeMark", "label": "Grade mark", "type": "text", "default": "F3" },
+        { "key": "productionDate", "label": "Production date", "type": "date", "default": "2026-06-18" },
+        { "key": "shelfLife", "label": "Shelf life", "type": "text", "default": "贮存期二年" },
+        { "key": "inspector", "label": "Inspector result", "type": "text", "default": "合格" }
+      ]
+    },
+    {
+      "title": "Company",
+      "fields": [
+        { "key": "companyCn", "label": "Company name (Chinese)", "type": "text", "default": "昆山运城塑业有限公司" },
+        { "key": "companyEn", "label": "Company name (English)", "type": "textarea", "default": "KUNSHAN YUNCHENG PLASTIC INDUSTRY CO., LTD" }
+      ]
+    }
+  ]
+}

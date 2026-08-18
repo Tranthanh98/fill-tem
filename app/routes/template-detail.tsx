@@ -1,65 +1,13 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { data, Link } from "react-router";
 
 import type { Route } from "./+types/template-detail";
 import { TemplateDocument } from "../components/template-document";
+import { getTemplate } from "../template-library.server";
 import {
-  getTemplate,
+  getDefaultValues,
   type TemplateValues,
-} from "../template-data";
-
-type FieldDefinition = {
-  key: keyof TemplateValues;
-  label: string;
-  unit?: string;
-  type?: "text" | "date";
-};
-
-type FieldSection = {
-  title: string;
-  fields: FieldDefinition[];
-};
-
-const fieldSections: FieldSection[] = [
-  {
-    title: "Product",
-    fields: [
-      { key: "productNameCn", label: "Product name (Chinese)" },
-      { key: "productNameEn", label: "Product name (English)" },
-      { key: "type", label: "Type" },
-      { key: "grade", label: "Grade" },
-      { key: "corona", label: "Corona" },
-      { key: "material", label: "Material" },
-    ],
-  },
-  {
-    title: "Dimensions & roll",
-    fields: [
-      { key: "thickness", label: "Thickness", unit: "μm" },
-      { key: "width", label: "Width", unit: "mm" },
-      { key: "length", label: "Length", unit: "m" },
-      { key: "netWeight", label: "Net weight", unit: "kg" },
-      { key: "jointCount", label: "Joint count" },
-    ],
-  },
-  {
-    title: "Tracking",
-    fields: [
-      { key: "productNumber", label: "Product number" },
-      { key: "gradeMark", label: "Grade mark" },
-      { key: "productionDate", label: "Production date", type: "date" },
-      { key: "shelfLife", label: "Shelf life" },
-      { key: "inspector", label: "Inspector result" },
-    ],
-  },
-  {
-    title: "Company",
-    fields: [
-      { key: "companyCn", label: "Company name (Chinese)" },
-      { key: "companyEn", label: "Company name (English)" },
-    ],
-  },
-];
+} from "../template-types";
 
 export function loader({ params }: Route.LoaderArgs) {
   const template = getTemplate(params.templateId);
@@ -73,44 +21,65 @@ export function loader({ params }: Route.LoaderArgs) {
 
 export function meta({ loaderData }: Route.MetaArgs) {
   return [
-    { title: loaderData ? `${loaderData.template.name} · Template Studio` : "Template Studio" },
+    {
+      title: loaderData
+        ? `${loaderData.template.name} · Template Studio`
+        : "Template Studio",
+    },
   ];
+}
+
+function restoreValues(saved: string | null, defaults: TemplateValues) {
+  if (!saved) return defaults;
+
+  const parsed = JSON.parse(saved) as unknown;
+  if (!parsed || typeof parsed !== "object") return defaults;
+
+  const savedValues = parsed as Record<string, unknown>;
+  return Object.fromEntries(
+    Object.entries(defaults).map(([key, fallback]) => [
+      key,
+      typeof savedValues[key] === "string" ? savedValues[key] : fallback,
+    ]),
+  );
 }
 
 export default function TemplateDetail({ loaderData }: Route.ComponentProps) {
   const { template } = loaderData;
-  const [values, setValues] = useState<TemplateValues>(template.defaults);
+  const defaults = useMemo(() => getDefaultValues(template), [template]);
+  const storageKey = `template-studio:${template.id}:v${template.schemaVersion}`;
+  const [values, setValues] = useState<TemplateValues>(defaults);
   const [zoom, setZoom] = useState(template.builderScale);
   const [saveState, setSaveState] = useState<"idle" | "saved">("idle");
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const previewScrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const saved = window.localStorage.getItem(`template-studio:${template.id}`);
+    const saved = window.localStorage.getItem(storageKey);
     try {
-      setValues(saved ? (JSON.parse(saved) as TemplateValues) : template.defaults);
+      setValues(restoreValues(saved, defaults));
     } catch {
-      window.localStorage.removeItem(`template-studio:${template.id}`);
-      setValues(template.defaults);
+      window.localStorage.removeItem(storageKey);
+      setValues(defaults);
     }
     setZoom(template.builderScale);
     setSaveState("idle");
     previewScrollRef.current?.scrollTo({ top: 0, left: 0 });
-  }, [template.id]);
+  }, [defaults, storageKey, template.builderScale]);
 
-  function updateField(key: keyof TemplateValues, value: string) {
+  function updateField(key: string, value: string) {
     setValues((current) => ({ ...current, [key]: value }));
     setSaveState("idle");
   }
 
   function saveTemplate() {
-    window.localStorage.setItem(`template-studio:${template.id}`, JSON.stringify(values));
+    window.localStorage.setItem(storageKey, JSON.stringify(values));
     setSaveState("saved");
   }
 
   function resetTemplate() {
-    setValues(template.defaults);
-    window.localStorage.removeItem(`template-studio:${template.id}`);
+    setValues(defaults);
+    window.localStorage.removeItem(storageKey);
     setSaveState("idle");
   }
 
@@ -122,7 +91,9 @@ export default function TemplateDetail({ loaderData }: Route.ComponentProps) {
     <div className="builder-page">
       <header className="builder-header">
         <div className="builder-header-left">
-          <Link className="back-button" to="/" aria-label="Back to templates">←</Link>
+          <Link className="back-button" to="/" aria-label="Back to templates">
+            ←
+          </Link>
           <div>
             <p className="builder-breadcrumb">Templates / {template.category}</p>
             <h1>{template.name}</h1>
@@ -150,7 +121,7 @@ export default function TemplateDetail({ loaderData }: Route.ComponentProps) {
           </div>
 
           <div className="field-sections">
-            {fieldSections.map((section) => (
+            {template.fieldGroups.map((section) => (
               <section className="field-section" key={section.title}>
                 <h3>{section.title}</h3>
                 <div className="field-list">
@@ -160,12 +131,23 @@ export default function TemplateDetail({ loaderData }: Route.ComponentProps) {
                       <label className="form-field" htmlFor={inputId} key={field.key}>
                         <span>{field.label}</span>
                         <div className="input-wrap">
-                          <input
-                            id={inputId}
-                            type={field.type ?? "text"}
-                            value={values[field.key]}
-                            onChange={(event) => updateField(field.key, event.target.value)}
-                          />
+                          {field.type === "textarea" ? (
+                            <textarea
+                              id={inputId}
+                              value={values[field.key] ?? ""}
+                              placeholder={field.placeholder}
+                              onChange={(event) => updateField(field.key, event.target.value)}
+                            />
+                          ) : (
+                            <input
+                              id={inputId}
+                              type={field.type}
+                              value={values[field.key] ?? ""}
+                              placeholder={field.placeholder}
+                              step={field.step}
+                              onChange={(event) => updateField(field.key, event.target.value)}
+                            />
+                          )}
                           {field.unit ? <span className="input-unit">{field.unit}</span> : null}
                         </div>
                       </label>
