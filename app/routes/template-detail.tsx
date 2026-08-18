@@ -3,9 +3,11 @@ import { data, Link } from "react-router";
 
 import type { Route } from "./+types/template-detail";
 import { TemplateDocument } from "../components/template-document";
-import { getTemplate } from "../template-library.server";
+import { getTemplate, getTemplatePair } from "../template-library.server";
 import {
   getDefaultValues,
+  renderTemplateHtml,
+  type TemplateDefinition,
   type TemplateValues,
 } from "../template-types";
 
@@ -16,7 +18,15 @@ export function loader({ params }: Route.LoaderArgs) {
     throw data("Template not found", { status: 404 });
   }
 
-  return { template };
+  const pairTemplates = template.pairId
+    ? getTemplatePair(template.pairId).sort(
+        (left, right) =>
+          (left.order ?? Number.MAX_SAFE_INTEGER) -
+          (right.order ?? Number.MAX_SAFE_INTEGER),
+      )
+    : [template];
+
+  return { template, pairTemplates };
 }
 
 export function meta({ loaderData }: Route.MetaArgs) {
@@ -44,15 +54,142 @@ function restoreValues(saved: string | null, defaults: TemplateValues) {
   );
 }
 
+function getPairDefaultValues(templates: TemplateDefinition[]) {
+  return templates.reduce<TemplateValues>(
+    (merged, item) => ({ ...merged, ...getDefaultValues(item) }),
+    {},
+  );
+}
+
+function getStorageKey(templates: TemplateDefinition[]) {
+  const pairId = templates[0]?.pairId;
+  const schemaVersion = Math.max(...templates.map((item) => item.schemaVersion));
+
+  return pairId
+    ? `template-studio:pair:${pairId}:v${schemaVersion}`
+    : `template-studio:${templates[0]?.id}:v${schemaVersion}`;
+}
+
+function scopeCss(css: string, prefix: string): string {
+  // Remove comments.
+  const cleaned = css.replace(/\/\*[\s\S]*?\*\//g, "");
+
+  // Temporarily remove @media blocks so they are not scoped twice.
+  const mediaBlocks: string[] = [];
+  const withPlaceholders = cleaned.replace(
+    /@media[^{]+\{[\s\S]+?\}\s*\}/g,
+    (match) => {
+      mediaBlocks.push(match);
+      return `__MEDIA_BLOCK_${mediaBlocks.length - 1}__`;
+    },
+  );
+
+  // Scope top-level rules. Skip @-rules.
+  const scopedTopLevel = withPlaceholders.replace(
+    /([^{}\s][^{}]*)\{/g,
+    (match, selectors: string) => {
+      const trimmed = selectors.trim();
+      if (trimmed.startsWith("@")) return match;
+      const scoped = trimmed
+        .split(",")
+        .map((selector) => `${prefix} ${selector.trim()}`)
+        .join(", ");
+      return match.replace(trimmed, scoped);
+    },
+  );
+
+  // Restore and scope the content inside @media blocks.
+  const scopedMedia = mediaBlocks.map((block) => {
+    const match = block.match(/(@media[^{]+)\{([\s\S]+)\}\s*\}$/);
+    if (!match) return block;
+    const [, mediaQuery, content] = match;
+    return `${mediaQuery} { ${scopeCss(content, prefix)} }`;
+  });
+
+  return scopedTopLevel.replace(
+    /__MEDIA_BLOCK_(\d+)__/g,
+    (_, index) => scopedMedia[Number(index)],
+  );
+}
+
+function buildPrintHtml(
+  templates: TemplateDefinition[],
+  values: TemplateValues,
+): string {
+  const parser = new DOMParser();
+  const pages = templates.map((template, index) => {
+    const rendered = renderTemplateHtml(template.templateHtml, values);
+    const doc = parser.parseFromString(rendered, "text/html");
+    const styles = Array.from(doc.querySelectorAll("style"))
+      .map((style) => scopeCss(style.textContent ?? "", `.page-${index + 1}`))
+      .join("\n");
+    const bodyStyle = doc.body.getAttribute("style") ?? "";
+    const bodyHtml = doc.body.innerHTML;
+
+    return {
+      index: index + 1,
+      styles,
+      bodyStyle,
+      bodyHtml,
+      width: template.canvas.width,
+      height: template.canvas.height,
+    };
+  });
+
+  return `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    ${pages.map((page) => `<style>${page.styles}</style>`).join("\n")}
+    <style>
+      * { box-sizing: border-box; }
+      html, body { margin: 0; padding: 0; }
+      @media print {
+        @page { margin: 0; }
+        .print-page { page-break-after: always; }
+        .print-page:last-child { page-break-after: auto; }
+      }
+      .print-page {
+        position: relative;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    ${pages
+      .map(
+        (page) =>
+          `<div class="print-page page-${page.index}" style="${page.bodyStyle} width:${page.width}px; height:${page.height}px;">${page.bodyHtml}</div>`,
+      )
+      .join("\n")}
+  </body>
+</html>`;
+}
+
 export default function TemplateDetail({ loaderData }: Route.ComponentProps) {
-  const { template } = loaderData;
-  const defaults = useMemo(() => getDefaultValues(template), [template]);
-  const storageKey = `template-studio:${template.id}:v${template.schemaVersion}`;
+  const { template, pairTemplates } = loaderData;
+  const defaults = useMemo(
+    () => getPairDefaultValues(pairTemplates),
+    [pairTemplates],
+  );
+  const storageKey = useMemo(
+    () => getStorageKey(pairTemplates),
+    [pairTemplates],
+  );
   const [values, setValues] = useState<TemplateValues>(defaults);
   const [zoom, setZoom] = useState(template.builderScale);
   const [saveState, setSaveState] = useState<"idle" | "saved">("idle");
-  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const iframeRefs = useRef<Map<string, HTMLIFrameElement>>(new Map());
   const previewScrollRef = useRef<HTMLDivElement>(null);
+
+  const targetWidth = useMemo(
+    () => Math.min(...pairTemplates.map((item) => item.canvas.width)),
+    [pairTemplates],
+  );
+
+  function getPreviewScale(item: TemplateDefinition) {
+    return item.canvas.width === 0 ? 1 : targetWidth / item.canvas.width;
+  }
 
   useEffect(() => {
     const saved = window.localStorage.getItem(storageKey);
@@ -84,8 +221,34 @@ export default function TemplateDetail({ loaderData }: Route.ComponentProps) {
   }
 
   function printTemplate() {
-    iframeRef.current?.contentWindow?.print();
+    const printWindow = window.open("", "_blank");
+    if (!printWindow) return;
+
+    printWindow.document.open();
+    printWindow.document.write(buildPrintHtml(pairTemplates, values));
+    printWindow.document.close();
+    printWindow.focus();
+
+    const triggerPrint = () => {
+      printWindow.print();
+      printWindow.addEventListener("afterprint", () => printWindow.close());
+    };
+
+    // Give the browser a moment to render styles before printing.
+    setTimeout(triggerPrint, 300);
   }
+
+  function registerIframe(templateId: string) {
+    return (element: HTMLIFrameElement | null) => {
+      if (element) {
+        iframeRefs.current.set(templateId, element);
+      } else {
+        iframeRefs.current.delete(templateId);
+      }
+    };
+  }
+
+  const isPair = pairTemplates.length > 1;
 
   return (
     <div className="builder-page">
@@ -117,7 +280,10 @@ export default function TemplateDetail({ loaderData }: Route.ComponentProps) {
           <div className="editor-intro">
             <p className="eyebrow">Content</p>
             <h2>Template fields</h2>
-            <p>Changes are rendered instantly in the preview.</p>
+            <p>
+              Changes are rendered instantly in the preview
+              {isPair ? " for both pages in this pair" : ""}.
+            </p>
           </div>
 
           <div className="field-sections">
@@ -164,6 +330,7 @@ export default function TemplateDetail({ loaderData }: Route.ComponentProps) {
             <div>
               <span className="status-dot" />
               Live preview
+              {isPair ? ` · ${pairTemplates.length} pages` : ""}
             </div>
             <div className="zoom-control" aria-label="Preview zoom">
               <button
@@ -185,14 +352,18 @@ export default function TemplateDetail({ loaderData }: Route.ComponentProps) {
           </div>
 
           <div className="preview-scroll-area" ref={previewScrollRef}>
-            <div className="preview-canvas-wrap">
-              <TemplateDocument
-                iframeRef={iframeRef}
-                scale={zoom}
-                template={template}
-                values={values}
-                title={`${template.name} live preview`}
-              />
+            <div className="preview-canvas-wrap preview-pair-wrap">
+              {pairTemplates.map((item) => (
+                <div className="preview-pair-item" key={item.id}>
+                  <TemplateDocument
+                    iframeRef={registerIframe(item.id)}
+                    scale={getPreviewScale(item) * zoom}
+                    template={item}
+                    values={values}
+                    title={`${item.name} live preview`}
+                  />
+                </div>
+              ))}
             </div>
           </div>
         </section>

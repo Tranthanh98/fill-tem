@@ -1,10 +1,10 @@
-import { useMemo, type RefObject } from "react";
+import { useMemo, type Ref } from "react";
 
 import type { TemplateDefinition, TemplateValues } from "../template-types";
 import { renderTemplateHtml } from "../template-types";
 
 type TemplateDocumentProps = {
-  iframeRef?: RefObject<HTMLIFrameElement | null>;
+  iframeRef?: Ref<HTMLIFrameElement | null>;
   scale: number;
   template: TemplateDefinition;
   values: TemplateValues;

@@ -77,6 +77,7 @@ function parseManifest(value: unknown, manifestPath: string): TemplateManifest {
     schemaVersion: value.schemaVersion,
     order: typeof value.order === "number" ? value.order : undefined,
     id: value.id,
+    pairId: typeof value.pairId === "string" ? value.pairId : undefined,
     name: value.name,
     description: value.description,
     category: value.category,
@@ -173,4 +174,8 @@ export function listTemplates() {
 
 export function getTemplate(templateId: string) {
   return templateById.get(templateId);
+}
+
+export function getTemplatePair(pairId: string) {
+  return templates.filter((template) => template.pairId === pairId);
 }

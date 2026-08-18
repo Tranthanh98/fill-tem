@@ -19,6 +19,7 @@ export type TemplateManifest = {
   schemaVersion: number;
   order?: number;
   id: string;
+  pairId?: string;
   name: string;
   description: string;
   category: string;
