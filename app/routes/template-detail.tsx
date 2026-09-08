@@ -70,6 +70,19 @@ function getStorageKey(templates: TemplateDefinition[]) {
     : `template-studio:${templates[0]?.id}:v${schemaVersion}`;
 }
 
+function getTemplateFrameWidth(template: TemplateDefinition) {
+  return template.canvas.frameWidth ?? template.canvas.width;
+}
+
+function getPairTargetFrameWidth(templates: TemplateDefinition[]) {
+  return Math.min(...templates.map(getTemplateFrameWidth));
+}
+
+function getWidthScale(template: TemplateDefinition, targetFrameWidth: number) {
+  const frameWidth = getTemplateFrameWidth(template);
+  return frameWidth === 0 ? 1 : targetFrameWidth / frameWidth;
+}
+
 function scopeCss(css: string, prefix: string): string {
   // Remove comments.
   const cleaned = css.replace(/\/\*[\s\S]*?\*\//g, "");
@@ -85,6 +98,11 @@ function scopeCss(css: string, prefix: string): string {
   );
 
   // Scope top-level rules. Skip @-rules.
+  // - `:root` and `html` stay unscoped (they target the document root and
+  //   define CSS variables that would be lost if scoped).
+  // - `body` is replaced with the prefix itself (e.g. `.page-1`) so that the
+  //   template's body styles (flex centering, padding, font, color) are applied
+  //   directly to the page wrapper div in the print output.
   const scopedTopLevel = withPlaceholders.replace(
     /([^{}\s][^{}]*)\{/g,
     (match, selectors: string) => {
@@ -92,7 +110,18 @@ function scopeCss(css: string, prefix: string): string {
       if (trimmed.startsWith("@")) return match;
       const scoped = trimmed
         .split(",")
-        .map((selector) => `${prefix} ${selector.trim()}`)
+        .map((selector) => {
+          const single = selector.trim();
+          if (single === "body") return prefix;
+          if (
+            single === "html" ||
+            single.startsWith(":root") ||
+            single.startsWith("::")
+          ) {
+            return single;
+          }
+          return `${prefix} ${single}`;
+        })
         .join(", ");
       return match.replace(trimmed, scoped);
     },
@@ -117,14 +146,19 @@ function buildPrintHtml(
   values: TemplateValues,
 ): string {
   const parser = new DOMParser();
+  const gap = 36;
+  const targetFrameWidth = getPairTargetFrameWidth(templates);
+
   const pages = templates.map((template, index) => {
     const rendered = renderTemplateHtml(template.templateHtml, values);
     const doc = parser.parseFromString(rendered, "text/html");
     const styles = Array.from(doc.querySelectorAll("style"))
       .map((style) => scopeCss(style.textContent ?? "", `.page-${index + 1}`))
-      .join("\n");
+      .join("\n")
+      .replace(/@page\s*\{[^}]*\}/g, "");
     const bodyStyle = doc.body.getAttribute("style") ?? "";
     const bodyHtml = doc.body.innerHTML;
+    const scale = getWidthScale(template, targetFrameWidth);
 
     return {
       index: index + 1,
@@ -133,8 +167,16 @@ function buildPrintHtml(
       bodyHtml,
       width: template.canvas.width,
       height: template.canvas.height,
+      scale,
+      renderedWidth: template.canvas.width * scale,
+      renderedHeight: template.canvas.height * scale,
     };
   });
+
+  const sheetWidth = Math.max(...pages.map((page) => page.renderedWidth));
+  const totalHeight =
+    pages.reduce((sum, page) => sum + page.renderedHeight, 0) +
+    gap * (pages.length - 1);
 
   return `<!doctype html>
 <html lang="en">
@@ -143,25 +185,68 @@ function buildPrintHtml(
     ${pages.map((page) => `<style>${page.styles}</style>`).join("\n")}
     <style>
       * { box-sizing: border-box; }
-      html, body { margin: 0; padding: 0; }
-      @media print {
-        @page { margin: 0; }
-        .print-page { page-break-after: always; }
-        .print-page:last-child { page-break-after: auto; }
+      html, body {
+        margin: 0;
+        padding: 0;
+        width: ${sheetWidth}px;
+        min-width: ${sheetWidth}px;
+        height: ${totalHeight}px;
+        min-height: ${totalHeight}px;
+        background: #fff;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+        color-adjust: exact;
       }
-      .print-page {
+      .print-sheet {
+        width: ${sheetWidth}px;
+        height: ${totalHeight}px;
+        margin: 0 auto;
+        background: #fff;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .print-template-slot {
         position: relative;
+        width: ${sheetWidth}px;
         overflow: hidden;
+        flex: 0 0 auto;
+      }
+      .print-template {
+        position: absolute;
+        top: 0;
+        left: 0;
+        min-width: 0 !important;
+        min-height: 0 !important;
+        overflow: hidden;
+        background: #fff;
+        transform-origin: top left;
+      }
+      .print-template-slot + .print-template-slot {
+        margin-top: ${gap}px;
+      }
+      @media print {
+        @page {
+          margin: 0;
+          size: ${sheetWidth}px ${totalHeight}px;
+        }
+        html, body {
+          print-color-adjust: exact;
+          -webkit-print-color-adjust: exact;
+          color-adjust: exact;
+        }
       }
     </style>
   </head>
   <body>
-    ${pages
-      .map(
-        (page) =>
-          `<div class="print-page page-${page.index}" style="${page.bodyStyle} width:${page.width}px; height:${page.height}px;">${page.bodyHtml}</div>`,
-      )
-      .join("\n")}
+    <div class="print-sheet">
+      ${pages
+        .map(
+          (page) =>
+            `<div class="print-template-slot" style="height:${page.renderedHeight}px;"><div class="print-template page-${page.index}" style="${page.bodyStyle}; left:${(sheetWidth - page.renderedWidth) / 2}px; width:${page.width}px; height:${page.height}px; transform:scale(${page.scale});">${page.bodyHtml}</div></div>`,
+        )
+        .join("\n")}
+    </div>
   </body>
 </html>`;
 }
@@ -182,13 +267,13 @@ export default function TemplateDetail({ loaderData }: Route.ComponentProps) {
   const iframeRefs = useRef<Map<string, HTMLIFrameElement>>(new Map());
   const previewScrollRef = useRef<HTMLDivElement>(null);
 
-  const targetWidth = useMemo(
-    () => Math.min(...pairTemplates.map((item) => item.canvas.width)),
+  const targetFrameWidth = useMemo(
+    () => getPairTargetFrameWidth(pairTemplates),
     [pairTemplates],
   );
 
   function getPreviewScale(item: TemplateDefinition) {
-    return item.canvas.width === 0 ? 1 : targetWidth / item.canvas.width;
+    return getWidthScale(item, targetFrameWidth);
   }
 
   useEffect(() => {
@@ -282,7 +367,7 @@ export default function TemplateDetail({ loaderData }: Route.ComponentProps) {
             <h2>Template fields</h2>
             <p>
               Changes are rendered instantly in the preview
-              {isPair ? " for both pages in this pair" : ""}.
+              {isPair ? " for both labels in this pair" : ""}.
             </p>
           </div>
 
@@ -330,7 +415,7 @@ export default function TemplateDetail({ loaderData }: Route.ComponentProps) {
             <div>
               <span className="status-dot" />
               Live preview
-              {isPair ? ` · ${pairTemplates.length} pages` : ""}
+              {isPair ? ` · ${pairTemplates.length} labels · 1 page` : ""}
             </div>
             <div className="zoom-control" aria-label="Preview zoom">
               <button
@@ -352,18 +437,20 @@ export default function TemplateDetail({ loaderData }: Route.ComponentProps) {
           </div>
 
           <div className="preview-scroll-area" ref={previewScrollRef}>
-            <div className="preview-canvas-wrap preview-pair-wrap">
-              {pairTemplates.map((item) => (
-                <div className="preview-pair-item" key={item.id}>
-                  <TemplateDocument
-                    iframeRef={registerIframe(item.id)}
-                    scale={getPreviewScale(item) * zoom}
-                    template={item}
-                    values={values}
-                    title={`${item.name} live preview`}
-                  />
-                </div>
-              ))}
+            <div className="preview-canvas-wrap">
+              <div className="preview-sheet">
+                {pairTemplates.map((item) => (
+                  <div className="preview-sheet-item" key={item.id}>
+                    <TemplateDocument
+                      iframeRef={registerIframe(item.id)}
+                      scale={getPreviewScale(item) * zoom}
+                      template={item}
+                      values={values}
+                      title={`${item.name} live preview`}
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </section>

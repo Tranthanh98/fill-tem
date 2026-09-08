@@ -23,7 +23,7 @@ export type TemplateManifest = {
   name: string;
   description: string;
   category: string;
-  canvas: { width: number; height: number };
+  canvas: { width: number; height: number; frameWidth?: number };
   thumbnailScale: number;
   builderScale: number;
   fieldGroups: TemplateFieldGroup[];

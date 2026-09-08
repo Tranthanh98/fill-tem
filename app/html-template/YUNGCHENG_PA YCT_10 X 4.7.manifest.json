@@ -6,7 +6,7 @@
   "name": "YUNGCHENG PA YCT",
   "description": "Compact label · 10 × 4.7",
   "category": "Product label",
-  "canvas": { "width": 860, "height": 560 },
+  "canvas": { "width": 860, "height": 560, "frameWidth": 800 },
   "thumbnailScale": 0.31,
   "builderScale": 0.82,
   "fieldGroups": [

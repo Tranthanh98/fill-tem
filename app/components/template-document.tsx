@@ -19,7 +19,9 @@ export function TemplateDocument({
   title,
 }: TemplateDocumentProps) {
   const source = useMemo(
-    () => renderTemplateHtml(template.templateHtml, values),
+    () =>
+      renderTemplateHtml(template.templateHtml, values) +
+      "<style>body{background:transparent !important}</style>",
     [template.templateHtml, values],
   );
 

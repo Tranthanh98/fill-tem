@@ -50,6 +50,8 @@ function parseManifest(value: unknown, manifestPath: string): TemplateManifest {
     !isRecord(value.canvas) ||
     typeof value.canvas.width !== "number" ||
     typeof value.canvas.height !== "number" ||
+    (value.canvas.frameWidth !== undefined &&
+      typeof value.canvas.frameWidth !== "number") ||
     typeof value.thumbnailScale !== "number" ||
     typeof value.builderScale !== "number" ||
     !Array.isArray(value.fieldGroups)
@@ -81,7 +83,14 @@ function parseManifest(value: unknown, manifestPath: string): TemplateManifest {
     name: value.name,
     description: value.description,
     category: value.category,
-    canvas: { width: value.canvas.width, height: value.canvas.height },
+    canvas: {
+      width: value.canvas.width,
+      height: value.canvas.height,
+      frameWidth:
+        typeof value.canvas.frameWidth === "number"
+          ? value.canvas.frameWidth
+          : undefined,
+    },
     thumbnailScale: value.thumbnailScale,
     builderScale: value.builderScale,
     fieldGroups,

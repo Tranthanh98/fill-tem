@@ -6,7 +6,7 @@
   "name": "YUNGCHENG PA YCT1",
   "description": "Production label · 15 μm × 940 mm",
   "category": "Product label",
-  "canvas": { "width": 1032, "height": 1192 },
+  "canvas": { "width": 1032, "height": 1192, "frameWidth": 1004 },
   "thumbnailScale": 0.205,
   "builderScale": 0.58,
   "fieldGroups": [
