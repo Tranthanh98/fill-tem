@@ -488,6 +488,45 @@ a.template-card:focus-visible {
   line-height: 1.5;
 }
 
+.label-selector {
+  display: flex;
+  margin-top: 18px;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.label-selector button {
+  height: 32px;
+  flex: 0 0 auto;
+  padding: 0 12px;
+  border: 1px solid #d8dee8;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #475467;
+  background: #fff;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.label-selector button:hover {
+  border-color: #a9b9d1;
+  background: #f8faff;
+}
+
+.label-selector button.is-selected {
+  border-color: #1c61e7;
+  color: #174da9;
+  background: #edf3ff;
+  box-shadow: 0 0 0 2px rgba(28, 97, 231, 0.1);
+}
+
+.label-selector button:focus-visible,
+.preview-copy:focus-visible {
+  outline: 3px solid rgba(28, 97, 231, 0.2);
+  outline-offset: 2px;
+}
+
 .field-sections {
   padding-bottom: 40px;
 }
@@ -655,13 +694,48 @@ a.template-card:focus-visible {
 
 .preview-sheet {
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   gap: 36px;
   padding: 36px 24px;
   background: #fff;
   box-shadow: 0 18px 50px rgba(27, 39, 63, 0.2), 0 2px 8px rgba(27, 39, 63, 0.12);
   border-radius: 2px;
+}
+
+.preview-copy {
+  position: relative;
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  align-items: center;
+  gap: 36px;
+  padding: 18px;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  color: inherit;
+  background: transparent;
+  transition: border-color 150ms ease, background 150ms ease, box-shadow 150ms ease;
+}
+
+.preview-copy:hover {
+  border-color: #b7c8e7;
+  background: #f8faff;
+}
+
+.preview-copy.is-selected {
+  border-color: #1c61e7;
+  background: #f7faff;
+  box-shadow: 0 0 0 3px rgba(28, 97, 231, 0.1);
+}
+
+.preview-copy-label {
+  position: absolute;
+  top: -27px;
+  left: 0;
+  color: #667085;
+  font-size: 11px;
+  font-weight: 700;
 }
 
 .preview-sheet-item {
@@ -721,7 +795,7 @@ a.template-card:focus-visible {
 
   .template-count,
   .button-ghost,
-  .button-secondary,
+  .print-button,
   .builder-breadcrumb {
     display: none;
   }
