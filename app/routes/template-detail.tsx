@@ -253,8 +253,9 @@ function buildPrintHtml(
   const copyWidthMm = 105;
   const copyWidthPx =
     (copyWidthMm / millimetersPerInch) * cssPixelsPerInch;
-  const printScale = copyWidthPx / copyWidth;
-  const scaledCopyHeight = copyHeight * printScale;
+  const copyScale = copyWidthPx / copyWidth;
+  const scaledCopyHeight = copyHeight * copyScale;
+  const scaledTemplateGap = gap * copyScale;
   const printPages = Array.from(
     { length: Math.ceil(copies.length / 2) },
     (_, pageIndex) => copies.slice(pageIndex * 2, pageIndex * 2 + 2),
@@ -292,28 +293,20 @@ function buildPrintHtml(
         break-after: auto;
         page-break-after: auto;
       }
-      .print-scaled-copy {
-        position: relative;
+      .print-copy {
+        display: flex;
         width: ${copyWidthMm}mm;
         height: ${scaledCopyHeight}px;
         flex: 0 0 ${copyWidthMm}mm;
-      }
-      .print-copy {
-        position: absolute;
-        top: 0;
-        left: 0;
-        display: flex;
-        width: ${copyWidth}px;
-        height: ${copyHeight}px;
         flex-direction: column;
         align-items: center;
-        gap: ${gap}px;
-        transform: scale(${printScale});
-        transform-origin: top left;
+        gap: ${scaledTemplateGap}px;
+        overflow: hidden;
+        contain: layout paint size;
       }
       .print-template-slot {
         position: relative;
-        width: ${copyWidth}px;
+        width: ${copyWidthMm}mm;
         overflow: hidden;
         flex: 0 0 auto;
       }
@@ -349,12 +342,12 @@ function buildPrintHtml(
         (pageCopies) => `<section class="print-page">
           ${pageCopies
             .map(
-              (pages) => `<div class="print-scaled-copy"><div class="print-copy">${pages
+              (pages) => `<div class="print-copy">${pages
                   .map(
                     (page) =>
-                      `<div class="print-template-slot" style="height:${page.renderedHeight}px;"><div class="print-template page-${page.index}" style="${page.bodyStyle}; left:${(copyWidth - page.renderedWidth) / 2}px; width:${page.width}px; height:${page.height}px; transform:scale(${page.scale});">${page.bodyHtml}</div></div>`,
+                      `<div class="print-template-slot" style="height:${page.renderedHeight * copyScale}px;"><div class="print-template page-${page.index}" style="${page.bodyStyle}; left:${((copyWidth - page.renderedWidth) / 2) * copyScale}px; width:${page.width}px; height:${page.height}px; transform:scale(${page.scale * copyScale});">${page.bodyHtml}</div></div>`,
                   )
-                  .join("\n")}</div></div>`,
+                  .join("\n")}</div>`,
             )
             .join("\n")}
         </section>`,
